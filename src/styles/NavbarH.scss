@@ -1,0 +1,41 @@
+body {
+    margin: 0;
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  padding: 18px 10px;
+  width: 100%;
+  background-color: black;
+  color: black;
+  gap: 50px;
+  box-shadow: 0px 4px 4px 0px #00000040;
+    position: fixed;
+    z-index: 1;
+}
+
+.navbar_logo {
+  width: 210px;
+  height: 68px;
+}
+
+.navbar_links {
+    display: flex;
+    flex: 100%;
+    justify-content: space-around;
+
+  a {
+    color: white;
+    text-decoration: none;
+    padding-bottom: 2px;
+    font-family: Roboto;
+    font-weight: 500;
+    font-size: 16
+px;
+    line-height: 24px;
+    letter-spacing: 0px;
+  }
+}
+
+
