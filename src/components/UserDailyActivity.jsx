@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from "react";
 import {
   BarChart,
   Bar,
@@ -6,53 +6,106 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  Legend,
   CartesianGrid,
-} from 'recharts'
+} from "recharts";
+import "../styles/UserDailyActivity.scss";
 
-const UserDailyActivity = () => {
-  const [sessions, setSessions] = useState([])
-  const userId = import.meta.env.VITE_USER
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await fetch('/user-activity.json')
-        const json = await res.json()
-
-        const user = json.find((u) => u.userId === parseInt(userId))
-        if (user) setSessions(user.sessions)
-      } catch (error) {
-        console.error('Erreur de chargement:', error)
-      }
-    }
-
-    fetchData()
-  }, [userId])
+function CustomTooltip({ active, payload }) {
+  if (!active || !payload) return null;
+  const kg = payload.find((p) => p.dataKey === "kilogram")?.value;
+  const kcal = payload.find((p) => p.dataKey === "calories")?.value;
 
   return (
-    <div style={{ width: '100%', height: 300, backgroundColor: '#FBFBFB', borderRadius: 5, padding: 20 }}>
-      <h4 style={{ marginBottom: 20 }}>Activité quotidienne</h4>
-      <ResponsiveContainer>
-        <BarChart data={sessions}>
+    <div className="custom-tooltip">
+      <span>{kg}kg</span>
+      <span>{kcal}Kcal</span>
+    </div>
+  );
+}
+
+export default function UserDailyActivity() {
+  const [sessions, setSessions] = useState([]);
+  const userId = parseInt(import.meta.env.VITE_USER, 10);
+
+  useEffect(() => {
+    fetch("/user-activity.json")
+      .then((res) => res.json())
+      .then((json) => {
+        const user = json.find((u) => u.userId === userId);
+        if (user) setSessions(user.sessions || []);
+      })
+      .catch((err) => console.error("Erreur:", err));
+  }, [userId]);
+
+  return (
+    <div className="user-daily-activity">
+      <div className="user-daily-activity__header">
+        <h4>Activité quotidienne</h4>
+        <div className="legend">
+          <div className="legend-item legend-item--kg">
+            <span className="dot"></span> Poids (kg)
+          </div>
+          <div className="legend-item legend-item--kcal">
+            <span className="dot"></span> Calories brûlées (kCal)
+          </div>
+        </div>
+      </div>
+
+      <ResponsiveContainer width="100%" height="85%">
+        <BarChart
+          data={sessions}
+          margin={{ top: 0, right: 20, left: 20, bottom: 10 }}
+          barCategoryGap="40%"
+          barGap={8}
+        >
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
-          <XAxis dataKey="day" tickFormatter={(date) => new Date(date).getDate()} />
-          <YAxis yAxisId="left" orientation="right" dataKey="kilogram" axisLine={false} tickLine={false} />
-          <YAxis yAxisId="right" dataKey="calories" hide />
-          <Tooltip
-            contentStyle={{ backgroundColor: '#E60000', color: 'white' }}
-            itemStyle={{ color: 'white' }}
-            formatter={(value, name) =>
-              name === 'kilogram' ? [`${value}kg`, 'Poids'] : [`${value}Kcal`, 'Calories']
-            }
+
+          <XAxis
+            dataKey="day"
+            tickFormatter={(d) => new Date(d).getDate()}
+            tickLine={false}
+            axisLine={false}
+            tickMargin={10}
           />
-          <Legend verticalAlign="top" align="right" iconType="circle" />
-          <Bar yAxisId="left" dataKey="kilogram" fill="#282D30" radius={[10, 10, 0, 0]} barSize={7} name="Poids (kg)" />
-          <Bar yAxisId="right" dataKey="calories" fill="#E60000" radius={[10, 10, 0, 0]} barSize={7} name="Calories brûlées (kCal)" />
+
+          <YAxis
+            yAxisId="kg"
+            dataKey="kilogram"
+            orientation="right"
+            axisLine={false}
+            tickLine={false}
+            allowDecimals={false}
+            domain={["dataMin - 1", "dataMax + 1"]}
+          />
+
+          <YAxis
+            yAxisId="kcal"
+            dataKey="calories"
+            hide
+            domain={["dataMin - 20", "dataMax + 20"]}
+          />
+
+          <Tooltip
+            content={<CustomTooltip />}
+            cursor={{ fill: "rgba(196,196,196,0.5)" }}
+          />
+
+          <Bar
+            yAxisId="kg"
+            dataKey="kilogram"
+            fill="#282D30"
+            radius={[10, 10, 0, 0]}
+            barSize={7}
+          />
+          <Bar
+            yAxisId="kcal"
+            dataKey="calories"
+            fill="#E60000"
+            radius={[10, 10, 0, 0]}
+            barSize={7}
+          />
         </BarChart>
       </ResponsiveContainer>
     </div>
-  )
+  );
 }
-
-export default UserDailyActivity

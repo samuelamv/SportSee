@@ -1,3 +1,40 @@
-.UserSessionActivity {
-    width: 258px;
+.avg-sessions {
+  width: 258px;
+  height: 263px;
+  background: #FF0000;
+  border-radius: 5px;
+  padding: 16px;
+  color: #fff;
+  box-sizing: border-box;
+  position: relative;
+
+  &__title {
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0.6;
+    margin: 0 0 8px 0;
+    max-width: 70%;
+    line-height: 1.4;
+  }
+
+  /* Ticks de l'axe X en blanc atténué */
+  .recharts-cartesian-axis-tick-value {
+    fill: rgba(255, 255, 255, 0.6);
+    font-size: 12px;
+  }
+
+  /* Overlay sombre à droite du curseur */
+  &__cursor {
+    fill: rgba(0, 0, 0, 0.1);
+  }
+
+  /* Tooltip blanc "xx min" */
+  &__tooltip {
+    background: #ffffff;
+    color: #000;
+    font-size: 12px;
+    padding: 6px 8px;
+    border-radius: 2px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  }
 }

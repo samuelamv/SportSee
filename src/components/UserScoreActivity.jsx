@@ -5,75 +5,65 @@ import {
   ResponsiveContainer,
   PolarAngleAxis
 } from "recharts";
+import "../styles/UserScoreActivity.scss";
 
 export default function Score() {
   const [score, setScore] = useState(null);
-  const userId = parseInt(import.meta.env.VITE_USER);
+  const userId = parseInt(import.meta.env.VITE_USER, 10);
 
   useEffect(() => {
     fetch("/user-main-data.json")
       .then((res) => res.json())
       .then((json) => {
         const user = json.find((u) => u.id === userId);
-        if (user) {
-          const value = user.todayScore ?? user.score ?? 0;
-          setScore(value);
-        }
-      });
+        if (user) setScore(user.todayScore ?? user.score ?? 0);
+      })
+      .catch(console.error);
   }, [userId]);
 
-  if (score === null) return <p>Chargement...</p>;
+  if (score === null) return <div className="score-card">Chargement...</div>;
 
-  const percentage = score * 100;
-
-  // ⚠️ Le background est un deuxième RadialBar "vide"
-  const data = [
-    { name: "completed", value: percentage, fill: "#FF0000" },
-    { name: "rest", value: 100 - percentage, fill: "#FBFBFB" }
-  ];
+  const percentage = Math.round(score * 100);
+  const data = [{ value: percentage }];
 
   return (
-    <div style={{
-      background: "#FBFBFB",
-      borderRadius: "5px",
-      padding: "1rem",
-      width: "100%",
-      height: "100%",
-      position: "relative"
-    }}>
-      <h3 style={{ fontSize: "16px", fontWeight: 500 }}>Score</h3>
-      <ResponsiveContainer width="100%" height={200}>
-        <RadialBarChart
-          cx="50%" cy="50%"
-          innerRadius="70%" outerRadius="80%"
-          barSize={10}
-          data={data}
-          startAngle={90}
-          endAngle={450}
-        >
-          <PolarAngleAxis type="number" domain={[0, 100]} angleAxisId={0} tick={false} />
-          <RadialBar
-            dataKey="value"
-            cornerRadius={10}
-            background
-            clockWise
-          />
-        </RadialBarChart>
-      </ResponsiveContainer>
+    <div className="score-card">
+      <h3 className="score-card__title">Score</h3>
 
-      <div style={{
-        position: "absolute",
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%, -50%)",
-        textAlign: "center"
-      }}>
-        <p style={{ fontSize: "26px", fontWeight: "bold" }}>
-          {Math.round(percentage)}%
-        </p>
-        <p style={{ fontSize: "14px", color: "#74798C" }}>
-          de votre<br />objectif
-        </p>
+      <div className="score-card__chart">
+        <ResponsiveContainer width="100%" height="100%">
+          <RadialBarChart
+            data={data}
+            cx="50%"
+            cy="50%"
+            startAngle={90}
+            endAngle={450}
+            innerRadius="68%"
+            outerRadius="80%"
+            barSize={12}
+            margin={{ top: 12, right: 12, bottom: 12, left: 12 }}
+          >
+            <PolarAngleAxis
+              type="number"
+              dataKey="value"
+              domain={[0, 100]}
+              tick={false}
+            />
+            <RadialBar
+              dataKey="value"
+              fill="#FF0000"
+              clockWise
+              cornerRadius={12}
+              minAngle={2}
+              isAnimationActive={false}
+            />
+          </RadialBarChart>
+        </ResponsiveContainer>
+
+        <div className="score-card__label">
+          <p className="score-card__percent">{percentage}%</p>
+          <p className="score-card__text">de votre<br />objectif</p>
+        </div>
       </div>
     </div>
   );

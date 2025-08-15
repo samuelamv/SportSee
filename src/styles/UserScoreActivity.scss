@@ -1,3 +1,63 @@
-.UserScoreActivity{
-    width: 258px;
+.score-card {
+  width: 258px;
+  height: 263px;
+  background: #fbfbfb;
+  border-radius: 5px;
+  padding: 16px;
+  box-sizing: border-box;
+  position: relative;
+
+  &__title {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+    font-weight: 500;
+    color: #2b2c34;
+  }
+
+  /* Zone du chart + disque blanc derrière */
+  &__chart {
+    position: relative;
+    width: 100%;
+    height: 200px; /* espace pour titre au-dessus */
+  }
+  &__chart::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 54%;
+    height: 54%;
+    transform: translate(-50%, -50%);
+    background: #ffffff; /* disque blanc plein */
+    border-radius: 50%;
+    z-index: 0; /* derrière le SVG */
+  }
+  &__chart .recharts-wrapper {
+    position: relative;
+    z-index: 1;
+    overflow: visible;
+  }
+
+  /* Texte centré dans le disque blanc */
+  &__label {
+    position: absolute;
+    top: 50%; /* centre vertical de la carte */
+    left: 50%; /* centre horizontal */
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 2; /* au-dessus de tout */
+    pointer-events: none;
+  }
+  &__percent {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 700;
+    color: #2b2c34;
+  }
+  &__text {
+    margin: 4px 0 0 0;
+    font-size: 14px;
+    line-height: 1.2;
+    color: #74798c;
+  }
 }

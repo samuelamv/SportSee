@@ -1,3 +1,16 @@
-.UserPerformanceActivity{
-    width: 258px;
+/* src/components/PerformanceChart.scss */
+.perf-chart {
+  width: 258px;
+  height: 263px;
+  background: #282D30;
+  border-radius: 5px;
+  padding: 12px;
+  box-sizing: border-box;
+  color: #fff;
+
+  /* Libellés des axes */
+  .recharts-polar-angle-axis .recharts-polar-angle-axis-tick-value {
+    fill: rgba(255, 255, 255, 0.8);
+    font-size: 12px;
+  }
 }

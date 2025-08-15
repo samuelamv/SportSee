@@ -1,3 +1,53 @@
-.UserDailyActivity{
-    width: 835px;
+.user-daily-activity {
+  width: auto;
+  height: 100%;
+  background-color: #FBFBFB;
+  border-radius: 5px;
+  padding: 20px;
+  box-sizing: border-box;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    h4 {
+      margin: 0;
+    }
+
+    .legend {
+      display: flex;
+      gap: 20px;
+      font-size: 14px;
+
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+
+        .dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+        }
+
+        &--kg .dot {
+          background: #282D30;
+        }
+        &--kcal .dot {
+          background: #E60000;
+        }
+      }
+    }
+  }
+}
+
+.custom-tooltip {
+  background: #E60000;
+  color: #fff;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
