@@ -1,13 +1,14 @@
 // src/components/UserName.jsx
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
+import { getUserId } from "../services/user.js";
 
 const UserName = () => {
-  const userId = parseInt(import.meta.env.VITE_USER, 10);
+  const userId = Number(getUserId());
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/user-main-data.json')
+    fetch("/user-main-data.json")
       .then((res) => res.json())
       .then((data) => {
         const found = data.find((u) => u.id === userId);
@@ -15,7 +16,7 @@ const UserName = () => {
         setLoading(false);
       })
       .catch((err) => {
-        console.error('Erreur fetch', err);
+        console.error("Erreur fetch", err);
         setLoading(false);
       });
   }, [userId]);
@@ -23,7 +24,8 @@ const UserName = () => {
   if (loading) return <p>Chargement...</p>;
   if (!user) return <p>Utilisateur introuvable</p>;
 
-  return <h1>Bonjour {user.userInfos.firstName} !</h1>
+  return <h1>Bonjour {user.userInfos.firstName} !</h1>;
 };
 
 export default UserName;
+

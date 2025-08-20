@@ -1,4 +1,3 @@
-// src/components/PerformanceChart.jsx
 import React, { useEffect, useState } from "react";
 import {
   Radar,
@@ -8,6 +7,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import "../styles/UserPerformanceActivity.scss";
+import { getUserId } from "../services/user.js";
 
 const ORDER = ["Intensité", "Vitesse", "Force", "Endurance", "Energie", "Cardio"];
 const FR_LABEL = {
@@ -21,7 +21,7 @@ const FR_LABEL = {
 
 export default function PerformanceChart() {
   const [data, setData] = useState([]);
-  const userId = parseInt(import.meta.env.VITE_USER, 10);
+  const userId = Number(getUserId());
 
   useEffect(() => {
     fetch("/user-performance.json")
@@ -30,19 +30,14 @@ export default function PerformanceChart() {
         const userData = json.find((u) => u.userId === userId);
         if (!userData) return;
 
-        // kind: {1:'cardio',2:'energy',...}  -> on mappe en FR
-        const kindMap = userData.kind; // index -> en
+        const kindMap = userData.kind;
         const formatted = userData.data.map((it) => {
           const en = kindMap[it.kind];
           const fr = FR_LABEL[en] ?? en;
           return { kind: fr, value: it.value };
         });
 
-        // Ordonner comme sur la maquette (sens horaire)
-        formatted.sort(
-          (a, b) => ORDER.indexOf(a.kind) - ORDER.indexOf(b.kind)
-        );
-
+        formatted.sort((a, b) => ORDER.indexOf(a.kind) - ORDER.indexOf(b.kind));
         setData(formatted);
       })
       .catch(console.error);
@@ -52,11 +47,7 @@ export default function PerformanceChart() {
     <div className="perf-chart">
       <ResponsiveContainer width="100%" height="100%">
         <RadarChart cx="50%" cy="50%" outerRadius="65%" data={data}>
-          <PolarGrid
-            radialLines={false}
-            stroke="#FFFFFF"
-            strokeOpacity={0.3}
-          />
+          <PolarGrid radialLines={false} stroke="#FFFFFF" strokeOpacity={0.3} />
           <PolarAngleAxis
             dataKey="kind"
             tickLine={false}

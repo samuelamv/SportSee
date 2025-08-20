@@ -9,6 +9,7 @@ import {
   CartesianGrid,
 } from "recharts";
 import "../styles/UserDailyActivity.scss";
+import { getUserId } from "../services/user.js";
 
 function CustomTooltip({ active, payload }) {
   if (!active || !payload) return null;
@@ -25,7 +26,7 @@ function CustomTooltip({ active, payload }) {
 
 export default function UserDailyActivity() {
   const [sessions, setSessions] = useState([]);
-  const userId = parseInt(import.meta.env.VITE_USER, 10);
+  const userId = Number(getUserId());
 
   useEffect(() => {
     fetch("/user-activity.json")
@@ -59,7 +60,6 @@ export default function UserDailyActivity() {
           barGap={8}
         >
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
-
           <XAxis
             dataKey="day"
             tickFormatter={(d) => new Date(d).getDate()}
@@ -67,7 +67,6 @@ export default function UserDailyActivity() {
             axisLine={false}
             tickMargin={10}
           />
-
           <YAxis
             yAxisId="kg"
             dataKey="kilogram"
@@ -77,33 +76,15 @@ export default function UserDailyActivity() {
             allowDecimals={false}
             domain={["dataMin - 1", "dataMax + 1"]}
           />
-
           <YAxis
             yAxisId="kcal"
             dataKey="calories"
             hide
             domain={["dataMin - 20", "dataMax + 20"]}
           />
-
-          <Tooltip
-            content={<CustomTooltip />}
-            cursor={{ fill: "rgba(196,196,196,0.5)" }}
-          />
-
-          <Bar
-            yAxisId="kg"
-            dataKey="kilogram"
-            fill="#282D30"
-            radius={[10, 10, 0, 0]}
-            barSize={7}
-          />
-          <Bar
-            yAxisId="kcal"
-            dataKey="calories"
-            fill="#E60000"
-            radius={[10, 10, 0, 0]}
-            barSize={7}
-          />
+          <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(196,196,196,0.5)" }} />
+          <Bar yAxisId="kg" dataKey="kilogram" fill="#282D30" radius={[10, 10, 0, 0]} barSize={7} />
+          <Bar yAxisId="kcal" dataKey="calories" fill="#E60000" radius={[10, 10, 0, 0]} barSize={7} />
         </BarChart>
       </ResponsiveContainer>
     </div>

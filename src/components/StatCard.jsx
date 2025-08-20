@@ -1,6 +1,7 @@
 // src/components/KeyDataCard.jsx
 import React from "react";
 import "../styles/StatCard.scss";
+import { getUserId } from "../services/user.js";
 
 export default function KeyDataCard({
   dataKey,            // "calorieCount" | "proteinCount" | "carbohydrateCount" | "lipidCount"
@@ -13,20 +14,42 @@ export default function KeyDataCard({
   const [user, setUser] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
-  const userId = parseInt(import.meta.env.VITE_USER, 10);
+
+  // 🧩 NE JETTE PAS D’ERREUR : on lit l’ID en optionnel
+  const userIdStr = getUserId({ optional: true });
+  const userId = userIdStr ? Number(userIdStr) : null;
 
   React.useEffect(() => {
     let on = true;
     setLoading(true);
+    setError(null);
+
+    // Si pas d'ID → on signale l'erreur et on arrête proprement
+    if (!userId && userId !== 0) {
+      if (on) {
+        setError('VITE_USER est manquante ou invalide dans votre .env');
+        setLoading(false);
+      }
+      return () => { on = false; };
+    }
+
     fetch(jsonUrl)
-      .then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
       .then((data) => {
         if (!on) return;
         const found = Array.isArray(data) ? data.find((u) => u.id === userId) : null;
         setUser(found || null);
         setLoading(false);
       })
-      .catch((e) => { if (!on) return; setError(e.message || String(e)); setLoading(false); });
+      .catch((e) => {
+        if (!on) return;
+        setError(e.message || String(e));
+        setLoading(false);
+      });
+
     return () => { on = false; };
   }, [jsonUrl, userId]);
 
