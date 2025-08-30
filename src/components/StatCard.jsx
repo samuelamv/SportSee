@@ -1,57 +1,38 @@
 // src/components/KeyDataCard.jsx
 import React from "react";
 import "../styles/StatCard.scss";
-import { getUserId } from "../services/user.js";
+import { getUserMainData } from "../services/apis.js"; // <-- utilise le service
 
 export default function KeyDataCard({
   dataKey,            // "calorieCount" | "proteinCount" | "carbohydrateCount" | "lipidCount"
   label,              // "Calories", "Protéines", ...
   unit = "",          // "kCal" | "g"
   icon,               // <img .../> ou <span>🔥</span>
-  iconBg = "#fdecec", // fond carré derrière l’icône (rose pâle par défaut)
-  jsonUrl = "/user-main-data.json",
+  iconBg = "#fdecec", // fond carré derrière l’icône
 }) {
   const [user, setUser] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
 
-  // 🧩 NE JETTE PAS D’ERREUR : on lit l’ID en optionnel
-  const userIdStr = getUserId({ optional: true });
-  const userId = userIdStr ? Number(userIdStr) : null;
-
   React.useEffect(() => {
-    let on = true;
+    let alive = true;
     setLoading(true);
     setError(null);
 
-    // Si pas d'ID → on signale l'erreur et on arrête proprement
-    if (!userId && userId !== 0) {
-      if (on) {
-        setError('VITE_USER est manquante ou invalide dans votre .env');
-        setLoading(false);
-      }
-      return () => { on = false; };
-    }
-
-    fetch(jsonUrl)
-      .then((r) => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.json();
-      })
+    getUserMainData()
       .then((data) => {
-        if (!on) return;
-        const found = Array.isArray(data) ? data.find((u) => u.id === userId) : null;
-        setUser(found || null);
+        if (!alive) return;
+        setUser(data ?? null);
         setLoading(false);
       })
       .catch((e) => {
-        if (!on) return;
+        if (!alive) return;
         setError(e.message || String(e));
         setLoading(false);
       });
 
-    return () => { on = false; };
-  }, [jsonUrl, userId]);
+    return () => { alive = false; };
+  }, []);
 
   if (loading) return <div className="kdc kdc--skeleton">Chargement…</div>;
   if (error)   return <div className="kdc kdc--error">Erreur: {error}</div>;

@@ -1,22 +1,22 @@
-// Service pour centraliser la récupération de l'ID utilisateur
-// depuis la variable d'environnement VITE_USER
-
+// src/services/user.js
 let _cachedUserId = null;
+let _cachedIsProd = null;
+let _cachedApiUrl = null;
 
-function readFromEnv() {
-  const raw = import.meta?.env?.VITE_USER;
-  return (raw && String(raw).trim()) || null;
+function readEnv(key) {
+  return (import.meta?.env?.[key] ?? '').toString().trim();
 }
 
-/**
- * Retourne l'ID utilisateur défini dans le .env
- * - Mémoïsé pour éviter de relire import.meta.env à chaque fois
- * - Lève une erreur si manquant (sauf si option { optional: true })
- */
+/** --------- USER ID --------- **/
+function readUserFromEnv() {
+  const raw = readEnv('VITE_USER');
+  return raw || null;
+}
+
 export function getUserId(opts) {
   if (_cachedUserId !== null) return _cachedUserId;
 
-  const id = readFromEnv();
+  const id = readUserFromEnv();
   if (!id) {
     if (opts && opts.optional) {
       _cachedUserId = null;
@@ -25,17 +25,49 @@ export function getUserId(opts) {
     const msg =
       "[user.js] VITE_USER est introuvable. " +
       'Ajoutez VITE_USER="<votre_id>" dans votre fichier .env puis redémarrez Vite.';
-    if (import.meta.env?.DEV) {
-      console.warn(msg);
-    }
+    if (import.meta.env?.DEV) console.warn(msg);
     throw new Error(msg);
   }
-
   _cachedUserId = id;
   return id;
 }
 
-/** Permet de vider le cache (utile pour les tests) */
 export function resetUserIdCache() {
   _cachedUserId = null;
 }
+
+/** --------- MODE / CONFIG --------- **/
+export function isProd() {
+  if (_cachedIsProd !== null) return _cachedIsProd;
+  _cachedIsProd = readEnv('VITE_PROD').toLowerCase() === 'true';
+  return _cachedIsProd;
+}
+
+export function getApiBaseUrl() {
+  if (_cachedApiUrl !== null) return _cachedApiUrl;
+  _cachedApiUrl = readEnv('VITE_API_URL') || 'http://localhost:3000';
+  return _cachedApiUrl;
+}
+
+/** --------- HELPERS RÉSEAU --------- **/
+export async function fetchJSON(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status} on ${url}`);
+  return res.json();
+}
+
+/**
+ * Import dynamique d’un JSON local (chemin relatif à ce fichier).
+ * Exemple: await loadLocal('../data/userMainData.json')
+ */
+export async function loadLocal(jsonPath) {
+  const mod = await import(/* @vite-ignore */ jsonPath);
+  return mod.default;
+}
+
+/** Choisit la source en fonction de isProd() */
+export async function choose(localFn, remoteFn) {
+  return isProd() ? remoteFn() : localFn();
+}
+console.log("VITE_PROD =", import.meta.env.VITE_PROD, "isProd() =>", isProd());
+

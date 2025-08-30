@@ -1,7 +1,8 @@
+// src/components/AverageSessionChart.jsx
 import React, { useEffect, useState } from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import "../styles/UserSessionActivity.scss";
-import { getUserId } from "../services/user.js";
+import { getUserAverageSessions } from "../services/apis.js";
 
 const dayLabels = ["L", "M", "M", "J", "V", "S", "D"];
 
@@ -18,19 +19,40 @@ function CustomCursor({ points, width, height }) {
 
 export default function AverageSessionChart() {
   const [data, setData] = useState([]);
-  const userId = Number(getUserId());
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch("/user-average-sessions.json")
-      .then((res) => res.json())
-      .then((json) => {
-        const userData = json.find((u) => u.userId === userId);
-        if (!userData) return;
-        const formatted = userData.sessions.map((s, i) => ({ ...s, day: dayLabels[i] }));
+    let alive = true;
+    setLoading(true);
+    setError(null);
+
+    getUserAverageSessions()
+      .then((res) => {
+        if (!alive) return;
+        const rows = Array.isArray(res?.sessions) ? res.sessions : [];
+
+        // mappe le jour: si 1..7 -> L..D ; sinon utilise l’index
+        const formatted = rows.map((s, idx) => {
+          const i = typeof s.day === "number" && s.day >= 1 && s.day <= 7 ? s.day - 1 : idx % 7;
+          return { ...s, day: dayLabels[i] };
+        });
+
         setData(formatted);
+        setLoading(false);
       })
-      .catch(console.error);
-  }, [userId]);
+      .catch((e) => {
+        if (!alive) return;
+        setError(e.message || String(e));
+        setLoading(false);
+      });
+
+    return () => { alive = false; };
+  }, []);
+
+  if (loading) return <div className="avg-sessions">Chargement…</div>;
+  if (error)   return <div className="avg-sessions" style={{color:"crimson"}}>Erreur : {error}</div>;
+  if (!data.length) return <div className="avg-sessions">Aucune donnée</div>;
 
   return (
     <div className="avg-sessions">

@@ -1,31 +1,30 @@
 // src/components/UserName.jsx
 import { useEffect, useState } from "react";
-import { getUserId } from "../services/user.js";
+import { getUserMainData } from "../services/apis.js";
 
 const UserName = () => {
-  const userId = Number(getUserId());
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch("/user-main-data.json")
-      .then((res) => res.json())
+    getUserMainData()
       .then((data) => {
-        const found = data.find((u) => u.id === userId);
-        setUser(found);
+        setUser(data);
         setLoading(false);
       })
       .catch((err) => {
-        console.error("Erreur fetch", err);
+        console.error("Erreur getUserMainData", err);
+        setError(err.message || String(err));
         setLoading(false);
       });
-  }, [userId]);
+  }, []);
 
   if (loading) return <p>Chargement...</p>;
+  if (error) return <p style={{color:"red"}}>Erreur : {error}</p>;
   if (!user) return <p>Utilisateur introuvable</p>;
 
   return <h1>Bonjour {user.userInfos.firstName} !</h1>;
 };
 
 export default UserName;
-

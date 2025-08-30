@@ -1,13 +1,10 @@
+// src/components/PerformanceChart.jsx
 import React, { useEffect, useState } from "react";
 import {
-  Radar,
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  ResponsiveContainer,
+  Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer,
 } from "recharts";
 import "../styles/UserPerformanceActivity.scss";
-import { getUserId } from "../services/user.js";
+import { getUserPerformance } from "../services/apis.js"; // <-- service
 
 const ORDER = ["Intensité", "Vitesse", "Force", "Endurance", "Energie", "Cardio"];
 const FR_LABEL = {
@@ -20,28 +17,52 @@ const FR_LABEL = {
 };
 
 export default function PerformanceChart() {
-  const [data, setData] = useState([]);
-  const userId = Number(getUserId());
+  const [data, setData]     = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError]     = useState(null);
 
   useEffect(() => {
-    fetch("/user-performance.json")
-      .then((res) => res.json())
-      .then((json) => {
-        const userData = json.find((u) => u.userId === userId);
-        if (!userData) return;
+    let alive = true;
+    setLoading(true);
+    setError(null);
 
-        const kindMap = userData.kind;
-        const formatted = userData.data.map((it) => {
-          const en = kindMap[it.kind];
+    getUserPerformance()
+      .then((perf) => {
+        if (!alive) return;
+
+        const kindMap = perf?.kind ?? {};
+        const rows = Array.isArray(perf?.data) ? perf.data : [];
+
+        const formatted = rows.map((it) => {
+          const en =
+            kindMap[it.kind] ??
+            kindMap[String(it.kind)] ?? // selon que la clé soit "1" ou 1
+            it.kind;
           const fr = FR_LABEL[en] ?? en;
           return { kind: fr, value: it.value };
         });
 
-        formatted.sort((a, b) => ORDER.indexOf(a.kind) - ORDER.indexOf(b.kind));
+        const orderIndex = (k) => {
+          const i = ORDER.indexOf(k);
+          return i === -1 ? ORDER.length : i;
+        };
+        formatted.sort((a, b) => orderIndex(a.kind) - orderIndex(b.kind));
+
         setData(formatted);
+        setLoading(false);
       })
-      .catch(console.error);
-  }, [userId]);
+      .catch((e) => {
+        if (!alive) return;
+        setError(e.message || String(e));
+        setLoading(false);
+      });
+
+    return () => { alive = false; };
+  }, []);
+
+  if (loading) return <div className="perf-chart">Chargement…</div>;
+  if (error)   return <div className="perf-chart" style={{ color: "crimson" }}>Erreur : {error}</div>;
+  if (!data.length) return <div className="perf-chart">Aucune donnée</div>;
 
   return (
     <div className="perf-chart">

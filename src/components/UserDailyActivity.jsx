@@ -1,21 +1,15 @@
+// src/components/UserDailyActivity.jsx
 import React, { useEffect, useState } from "react";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  CartesianGrid,
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
 } from "recharts";
 import "../styles/UserDailyActivity.scss";
-import { getUserId } from "../services/user.js";
+import { getUserActivity } from "../services/apis.js"; // <-- le service
 
 function CustomTooltip({ active, payload }) {
   if (!active || !payload) return null;
   const kg = payload.find((p) => p.dataKey === "kilogram")?.value;
   const kcal = payload.find((p) => p.dataKey === "calories")?.value;
-
   return (
     <div className="custom-tooltip">
       <span>{kg}kg</span>
@@ -26,17 +20,33 @@ function CustomTooltip({ active, payload }) {
 
 export default function UserDailyActivity() {
   const [sessions, setSessions] = useState([]);
-  const userId = Number(getUserId());
+  const [loading, setLoading]   = useState(true);
+  const [error, setError]       = useState(null);
 
   useEffect(() => {
-    fetch("/user-activity.json")
-      .then((res) => res.json())
-      .then((json) => {
-        const user = json.find((u) => u.userId === userId);
-        if (user) setSessions(user.sessions || []);
+    let alive = true;
+    setLoading(true);
+    setError(null);
+
+    getUserActivity()
+      .then((d) => {
+        if (!alive) return;
+        // d ressemble à { userId, sessions: [...] } (local ET backend)
+        setSessions(Array.isArray(d?.sessions) ? d.sessions : []);
+        setLoading(false);
       })
-      .catch((err) => console.error("Erreur:", err));
-  }, [userId]);
+      .catch((e) => {
+        if (!alive) return;
+        setError(e.message || String(e));
+        setLoading(false);
+      });
+
+    return () => { alive = false; };
+  }, []);
+
+  if (loading) return <div className="user-daily-activity">Chargement…</div>;
+  if (error)   return <div className="user-daily-activity" style={{color:"crimson"}}>Erreur : {error}</div>;
+  if (!sessions.length) return <div className="user-daily-activity">Aucune session</div>;
 
   return (
     <div className="user-daily-activity">
@@ -62,7 +72,11 @@ export default function UserDailyActivity() {
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
           <XAxis
             dataKey="day"
-            tickFormatter={(d) => new Date(d).getDate()}
+            tickFormatter={(d) => {
+              // backend: '2020-07-01' -> 1 ; local identique
+              const date = new Date(d);
+              return Number.isNaN(date) ? d : date.getDate();
+            }}
             tickLine={false}
             axisLine={false}
             tickMargin={10}
@@ -83,7 +97,7 @@ export default function UserDailyActivity() {
             domain={["dataMin - 20", "dataMax + 20"]}
           />
           <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(196,196,196,0.5)" }} />
-          <Bar yAxisId="kg" dataKey="kilogram" fill="#282D30" radius={[10, 10, 0, 0]} barSize={7} />
+          <Bar yAxisId="kg"  dataKey="kilogram" fill="#282D30" radius={[10, 10, 0, 0]} barSize={7} />
           <Bar yAxisId="kcal" dataKey="calories" fill="#E60000" radius={[10, 10, 0, 0]} barSize={7} />
         </BarChart>
       </ResponsiveContainer>
