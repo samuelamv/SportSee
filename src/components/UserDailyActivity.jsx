@@ -54,10 +54,10 @@ export default function UserDailyActivity() {
         <h4>Activité quotidienne</h4>
         <div className="legend">
           <div className="legend-item legend-item--kg">
-            <span className="dot"></span> Poids (kg)
+            <span className="dot"></span> <p className="legendp">Poids (kg)</p>
           </div>
           <div className="legend-item legend-item--kcal">
-            <span className="dot"></span> Calories brûlées (kCal)
+            <span className="dot"></span> <p className="legendp">Calories brûlées (kCal)</p>
           </div>
         </div>
       </div>

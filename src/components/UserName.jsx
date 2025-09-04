@@ -1,6 +1,7 @@
 // src/components/UserName.jsx
 import { useEffect, useState } from "react";
 import { getUserMainData } from "../services/apis.js";
+import '../styles/UserName.scss'
 
 const UserName = () => {
   const [user, setUser] = useState(null);
@@ -21,10 +22,14 @@ const UserName = () => {
   }, []);
 
   if (loading) return <p>Chargement...</p>;
-  if (error) return <p style={{color:"red"}}>Erreur : {error}</p>;
+  if (error) return <p style={{ color: "red" }}>Erreur : {error}</p>;
   if (!user) return <p>Utilisateur introuvable</p>;
 
-  return <h1>Bonjour {user.userInfos.firstName} !</h1>;
+  return (
+    <h1>
+      Bonjour <span className="user-firstname">{user.userInfos.firstName}</span>
+    </h1>
+  );
 };
 
 export default UserName;

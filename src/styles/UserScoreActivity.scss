@@ -1,22 +1,39 @@
 .score-card {
   background: #f5f6f8;
   border-radius: 12px;
-  padding: 16px;
+  padding: 10px 16px 0 16px;
 
   &__title {
     margin: 0 0 8px;
-    font-weight: 600;
-    font-size: 14px;   /* plus petit */
+    font-size: 14px; /* plus petit */
     color: #1b1d29;
+    font-family: Roboto;
+    font-weight: 500;
+    font-size: 15px;
+    line-height: 24px;
+    letter-spacing: 0px;
+
   }
 
+  /* 🔵 SOLUTION 1 : carré responsive avec max-width = max-height */
   &__square {
     position: relative;
     width: 100%;
-    aspect-ratio: 1 / 1;
+    aspect-ratio: 1 / 1;  /* garde le conteneur parfaitement carré */
+    max-width: 180px;     /* largeur max égale à hauteur max */
     max-height: 180px;
     margin: 0 auto;
   }
+
+  /* 🔵 SOLUTION 2 : carré fixe avec width/height identiques
+  &__square {
+    position: relative;
+    width: 100%;
+    max-width: 180px;
+    height: 180px;        // force la hauteur
+    margin: 0 auto;
+  }
+  */
 
   &__svg {
     position: absolute;
@@ -38,7 +55,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;   /* << centre vertical exact */
+    justify-content: center; /* centre vertical exact */
     text-align: center;
     z-index: 2;
     pointer-events: none;
@@ -59,5 +76,7 @@
     font-size: 12px;
   }
 
-  &__error { color: #d00; }
+  &__error {
+    color: #d00;
+  }
 }

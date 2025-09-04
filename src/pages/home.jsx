@@ -22,7 +22,7 @@ export default function Home() {
     <div className="parent">
       <div className="div1"><NavbarH /></div>
       <div className="div2"><NavbarV /></div>
-      <div className="div3"><UserName /><p>Félicitation ! Vous avez explosé vos objectifs hier</p></div>
+      <div className="div3"><UserName /><p className="subtitle">Félicitation ! Vous avez explosé vos objectifs hier 👏</p></div>
       <div className="div4"><UserDailyActivity /></div>
       <div className="div5"><AverageSessionChart /></div>
       <div className="div6"><PerformanceChart /></div>

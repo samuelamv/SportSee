@@ -1,10 +1,14 @@
 // src/components/PerformanceChart.jsx
 import React, { useEffect, useState } from "react";
 import {
-  Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer,
+  Radar,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  ResponsiveContainer,
 } from "recharts";
 import "../styles/UserPerformanceActivity.scss";
-import { getUserPerformance } from "../services/apis.js"; // <-- service
+import { getUserPerformance } from "../services/apis.js";
 
 const ORDER = ["Intensité", "Vitesse", "Force", "Endurance", "Energie", "Cardio"];
 const FR_LABEL = {
@@ -17,9 +21,9 @@ const FR_LABEL = {
 };
 
 export default function PerformanceChart() {
-  const [data, setData]     = useState([]);
+  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError]     = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     let alive = true;
@@ -36,7 +40,7 @@ export default function PerformanceChart() {
         const formatted = rows.map((it) => {
           const en =
             kindMap[it.kind] ??
-            kindMap[String(it.kind)] ?? // selon que la clé soit "1" ou 1
+            kindMap[String(it.kind)] ??
             it.kind;
           const fr = FR_LABEL[en] ?? en;
           return { kind: fr, value: it.value };
@@ -57,11 +61,18 @@ export default function PerformanceChart() {
         setLoading(false);
       });
 
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, []);
 
   if (loading) return <div className="perf-chart">Chargement…</div>;
-  if (error)   return <div className="perf-chart" style={{ color: "crimson" }}>Erreur : {error}</div>;
+  if (error)
+    return (
+      <div className="perf-chart" style={{ color: "crimson" }}>
+        Erreur : {error}
+      </div>
+    );
   if (!data.length) return <div className="perf-chart">Aucune donnée</div>;
 
   return (
@@ -69,12 +80,18 @@ export default function PerformanceChart() {
       <ResponsiveContainer width="100%" height="100%">
         <RadarChart cx="50%" cy="50%" outerRadius="65%" data={data}>
           <PolarGrid radialLines={false} stroke="#FFFFFF" strokeOpacity={0.3} />
+          {/* ✅ On garde juste le style, avec fontSize à 8 */}
           <PolarAngleAxis
             dataKey="kind"
             tickLine={false}
             axisLine={false}
-            tick={{ fontSize: 12 }}
-            stroke="#FFFFFF"
+            tick={{
+              fontFamily: "Roboto, sans-serif",
+              fontWeight: 500,
+              fontSize: 8,
+              letterSpacing: 0,
+              fill: "rgba(255,255,255,0.8)",
+            }}
           />
           <Radar
             name="performance"
