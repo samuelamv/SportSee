@@ -28,13 +28,19 @@
 .kdc__value {
   font-weight: 700;
   font-size: 18px;
-  color: #111827; /* gris foncé */
+  font-family: Roboto;
+  color: #282D30; /* gris foncé */
 }
 
 .kdc__label {
   margin-top: 4px;
-  font-size: 12px;
-  color: #9CA3AF; /* gris clair */
+  color: #74798C; /* gris clair */
+  font-family: Roboto;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 24px;
+  letter-spacing: 0px;
+
 }
 
 /* états */
