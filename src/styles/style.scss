@@ -15,8 +15,10 @@
 .div6 { grid-area: 4 / 3 / 6 / 4; }
 .div7 { grid-area: 4 / 4 / 6 / 5; }
 .div8 { grid-area: 3 / 5 / 6 / 6;     
-    row-gap: 25px;
-    display: flex;
-    flex-direction: column;
-    margin-right: 90px; }
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* espace distribué entre les enfants */
+  margin-right: 90px;
+  height: 94%;
+ }
 

@@ -1,10 +1,14 @@
 .score-card {
+  width: auto;
+  height: 85%;
   background: #f5f6f8;
   border-radius: 12px;
-  padding: 10px 16px 0 16px;
+  padding: 0 16px 0 16px;
 
   &__title {
-    margin: 0 0 8px;
+    position: relative;
+    top: 10px;
+    margin: 0 0 20px;
     font-size: 14px; /* plus petit */
     color: #1b1d29;
     font-family: Roboto;
