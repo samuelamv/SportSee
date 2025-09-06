@@ -1,7 +1,9 @@
 // src/components/UserName.jsx
 import { useEffect, useState } from "react";
 import { getUserMainData } from "../services/apis.js";
+import FullScreenError from "./FullScreenError";
 import '../styles/UserName.scss'
+
 
 const UserName = () => {
   const [user, setUser] = useState(null);
@@ -22,7 +24,7 @@ const UserName = () => {
   }, []);
 
   if (loading) return <p>Chargement...</p>;
-  if (error) return <p style={{ color: "red" }}>Erreur : {error}</p>;
+  if (error) return <FullScreenError message={error} />;
   if (!user) return <p>Utilisateur introuvable</p>;
 
   return (

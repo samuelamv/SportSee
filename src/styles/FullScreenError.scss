@@ -1,0 +1,31 @@
+.fs-error {
+  position: fixed;
+  inset: 0;               /* top:0; right:0; bottom:0; left:0 */
+  background: #fff;       /* fond blanc */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;          /* au-dessus de tout */
+}
+
+.fs-error__box {
+  max-width: 480px;
+  width: calc(100% - 32px);
+  padding: 24px 28px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+  text-align: center;
+}
+
+.fs-error__title {
+  margin: 0 0 6px;
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.fs-error__msg {
+  margin: 0;
+  color: #444;
+  overflow-wrap: anywhere; /* évite que les longues URLs débordent */
+}
